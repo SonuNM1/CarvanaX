@@ -2,10 +2,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import React from 'react'
 
 
-const DropdownField = ({item}) => {
+const DropdownField = ({item, handleInputChange}) => {
   return (
     <div>
-      <Select>
+      <Select 
+      onValueChange={(value) => handleInputChange(item.name, value)}
+      required={item.required}
+      >
         <SelectTrigger className="w-full">
             <SelectValue placeholder={item.label} />
         </SelectTrigger>

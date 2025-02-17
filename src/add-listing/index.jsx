@@ -1,5 +1,5 @@
 import Header from '@/components/Header'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import carDetails from "./../Shared/carDetails.json"
 import InputField from './components/InputField'
 import DropdownField from './components/DropdownField'
@@ -9,14 +9,52 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import TextAreaField from './components/TextAreaField'
 import { db } from './../../configs'
-import { CarListing } from './../../configs/schema'
+import { CarImages, CarListing } from './../../configs/schema'
 import IconField from './components/IconField'
 import UploadImages from './components/UploadImages'
+import {BiLoaderAlt} from 'react-icons/bi'
+import { toast } from 'sonner'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useUser } from '@clerk/clerk-react'
+import moment from 'moment'
+import { eq } from 'drizzle-orm'
+import Service from '@/Shared/Service'
 
 const AddListing = () => {
 
   const [formData, setFormData] = useState([])
   const [featuresData, setFeaturesData] = useState([])
+  const [triggerUploadImages, setTriggerUploadImages] = useState()
+  const [loader, setLoader] = useState(false)
+  const [carInfo, setCarInfo] = useState() ; 
+
+  const [searchParams] = useSearchParams()
+
+  const {user} = useUser() ; 
+
+  const navigate = useNavigate()
+
+  const mode = searchParams.get('mode')
+  const recordId = searchParams.get('id')
+
+  useEffect(()=> {
+    if(mode == 'edit'){
+      GetListingDetail()
+    }
+  }, [])
+
+  const GetListingDetail = async () => {
+      const result = await db.select().from(CarListing)
+        .innerJoin(CarImages, eq(CarListing.id , CarImages.carListingId))
+        .where(eq(CarListing.id, recordId))
+
+      const resp = Service.FormatResult(result)
+      
+      setCarInfo(resp[0])
+      setFormData(resp[0])
+      setFeaturesData(resp[0].features)
+      
+  }
 
   /**
    * Used to capture user input from form
@@ -47,22 +85,48 @@ const AddListing = () => {
   }
 
   const onSubmit = async (e) => {
-    e.preventDefault() ; 
 
+    setLoader(true) ;
+    e.preventDefault() ; 
     console.log("form data: ",formData) ; 
 
-    try {
-      const result = await db.insert(CarListing).values({
-        ...formData,
-        features: featuresData
-      }) ; 
+    toast('Please Wait...')
 
-    if(result){
-      console.log('Data saved')
+    if(mode == 'edit'){
+      const result = await db.update(CarListing).set({
+        ...formData,
+          features: featuresData,
+          createdBy: user?.primaryEmailAddress?.emailAddress,
+          postedOn: moment().format('DD/MM/yyyy')
+      }).where(eq(CarListing.id, recordId)).returning({id: CarListing.id}) ; 
+
+      console.log(result)
+
+      navigate('/profile')
+      setLoader(false)
     }
-    } catch (error) {
-      console.log('Error in data listing: ', error)
-    }
+    else{
+      try {
+        const result = await db.insert(CarListing).values({
+          ...formData,
+          features: featuresData,
+          createdBy: user?.primaryEmailAddress?.emailAddress,
+          postedOn: moment().format('DD/MM/yyyy')
+        }
+      ).returning({id:CarListing.id}) ; 
+  
+      if(result){
+        console.log('Car listing saved with ID: ', result[0]?.id)
+  
+        setTriggerUploadImages(result[0]?.id)
+  
+        setLoader(false) ; 
+      }
+  
+      } catch (error) {
+        console.log('Error in data listing: ', error)
+      }
+    }    
   }
 
   return (
@@ -88,12 +152,15 @@ const AddListing = () => {
                           {item?.label} {item.required && <span className='text-red-500'>*</span>} </label>
                             {item.fieldType == 'text' || item.fieldType == 'number' ? <InputField item={item}
                             handleInputChange={handleInputChange}
+                            carInfo={carInfo}
                             /> 
                             : item.fieldType == 'dropdown' ? <DropdownField item={item} 
                              handleInputChange={handleInputChange}
+                             carInfo={carInfo}
                             />
                             : item.fieldType == 'textarea' ? <TextAreaField item={item}
                             handleInputChange={handleInputChange}
+                            carInfo={carInfo}
                             />  
                             : null }
                           </div>
@@ -116,6 +183,7 @@ const AddListing = () => {
                     key={index}>
                       <Checkbox 
                         onCheckedChange={(value) => handleFeaturesChange(item.name, value)}
+                        checked={featuresData?.[item?.name]}
                       /> <h2>{item.label}</h2>
                     </div>
                   ))
@@ -127,18 +195,28 @@ const AddListing = () => {
 
             <Separator className='my-6'/>
             
-            
+            <UploadImages
+              triggerUploadImages={triggerUploadImages}
+
+              setLoader={(v) => {
+                setLoader(v) ; 
+                navigate('/profile')
+              }}
+            />
 
             <div className='mt-10 flex justify-end'>
               <Button 
               type="submit"
+              disabled={loader}
               onClick={(e) => onSubmit(e)}
-              >Submit</Button>
+              >
+              {
+                !loader ? "Submit" : <BiLoaderAlt className='animate-spin text-lg'/> 
+              }
+              Submit</Button>
             </div>
 
         </form>
-
-        <UploadImages/>
 
       </div>
     </div>
@@ -147,4 +225,4 @@ const AddListing = () => {
 
 export default AddListing
 
-// 1.51 - 2.30 - 2.50
+// 1.51 - 2.30 - 3.02 - 3.12 

@@ -9,7 +9,10 @@ const Header = () => {
 
   return (
     <div className='flex justify-between items-center shadow-sm p-5'>
+
+      <Link to={'/'}>
       <img src='/logo.jpg' width={70} height={80} />
+      </Link>
 
       <ul className='hidden md:flex gap-16'>
         <li className='font-medium hover:scale-105 transition-all cursor-pointer'>Home</li>
@@ -23,11 +26,11 @@ const Header = () => {
             <div className='flex items-center gap-5'>
                 <UserButton/>
                 <Link to={'/profile'}>
-                  <Button>Submit Listing</Button>
+                  <Button className='cursor-pointer bg-blue-600 hover:bg-blue-700 text-white'>Submit Listing</Button>
                 </Link>
             </div>
             : 
-            <Button>Submit Listing</Button>
+            <Button className='cursor-pointer'>Submit Listing</Button>
       }
 
     </div>

@@ -1,9 +1,15 @@
 
 - npx shadcn@canary add select
 
-- npm install @faker-js/faker --save-dev  
+- npm install @faker-js/faker --save-dev
+
+- npm i moments 
+
+- You can provide a way better UX than this when your app throws errors by providing your own ErrorBoundary or errorElement prop on your route.
 
 - Drizzle ORM (Object Relation Mapping) and Neon 
+
+- useSearchParams()
 
 - Drizzle studio 
 
@@ -68,3 +74,11 @@ const UploadImages = () => {
 };
 
 export default UploadImages;
+
+
+
+
+// await db.insert(CarImages).values({
+      //   imageUrl: getDownloadURL, 
+      //   carListingId: triggerUploadImages
+      // })

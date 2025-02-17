@@ -1,112 +1,140 @@
+import { db } from "./../../../configs";
+import { CarImages } from "./../../../configs/schema";
+import React, { useEffect, useState } from "react";
+import { IoMdCloseCircle } from "react-icons/io";
 
-import React, { useState } from 'react'
-import {IoMdCloseCircle} from 'react-icons/io'
-import imageCompression from 'browser-image-compression';
-import { Button } from '@/components/ui/button';
+const UploadImages = ({triggerUploadImages, setLoader}) => {
 
-const UploadImages = () => {
+  const [selectedFileList, setSelectedFileList] = useState([]);
+  const [uploadedImages, setUploadedImages] = useState([]);
 
-    const [selectedFileList, setSelectedFileList] = useState([])
-    const [uploadedImages, setUploadedImages] = useState([]) ;
-    
-    const UPLOAD_PRESET = "CarvanaX";
+  useEffect(()=> {
 
-    const onFileSelected = (e) => {
-        const files = e.target.files ; 
-        // console.log(files)
+    if(triggerUploadImages){
+      selectedFileList.forEach(async (file) => {
+        await UploadImageToServer(file, triggerUploadImages)
+      })
 
-        if(!files){
-            return ; // if the user cancels, then we get undefined value 
-        }
+      setSelectedFileList([]) ; // clear selected files after upload
+    }
+  }, [triggerUploadImages])
 
-        for(let i=0 ; i < files?.length ; i++){
-            const file = files[i] ; 
+  const UPLOAD_PRESET = "CarvanaX";
+  const CLOUD_NAME = "dtbybby9o";
 
-            setSelectedFileList((prev) => [
-                ...prev, 
-                file
-            ])
+  // Handle file selection
+  const onFileSelected = (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return; // If user cancels file selection, return
 
-            // uploadImageToCloudinary(file) ; 
-        }
+    setSelectedFileList((prev) => [...prev, ...files]);
+  };
+
+  // Upload all selected images
+  const uploadImages = async () => {
+    if (selectedFileList.length === 0) {
+      alert("No images selected to upload.");
+      return;
     }
 
-    // Upload image to cloudinary 
+    const uploadedURLs = [];
 
-    const uploadImageToCloudinary = async (file) => {
+    for (const file of selectedFileList) {
+      const url = await UploadImageToServer(file);
+      if (url) uploadedURLs.push(url); // Store successful uploads
+    }
 
-        try {
+    setUploadedImages(uploadedURLs);
+    setSelectedFileList([]); // Clear selection after upload
+  };
 
-        const formData = new FormData() ; 
+  // Upload a single image to Cloudinary
+  
+  const UploadImageToServer = async (file, carListingId) => {
 
-        formData.append('file', file)
-        formData.append('upload_preset', UPLOAD_PRESET)
+    setLoader(true)
 
-        formData.append('cloud_name', 'dtbybby9o')
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", UPLOAD_PRESET);
 
-        const response = await fetch('https://api.cloudinary.com/v1_1/dtbybby9o/image/upload', {
-                method: 'POST',
-                body: formData
-            })
-
-            const uploadedImageURL = await response.json() ; 
-
-            console.log('Uploaded        image URL: ', uploadedImageURL.url)
-
-            return uploadedImageURL.secure_url ; 
-
-        } catch (error) {
-            console.error("Cloudinary upload error: ", error || error.message)
-
-            alert('Image upload failed! Please try again.')
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
         }
+      );
+
+      const uploadedImage = await response.json();
+
+      if (!uploadedImage.secure_url) throw new Error("Upload failed");
+
+      console.log("Uploaded Image URL:", uploadedImage.secure_url);
+
+      // save image url to database 
+
+      await db.insert(CarImages).values({
+        imageUrl: uploadedImage.secure_url,
+        carListingId
+      })
+
+      return uploadedImage.secure_url
+
+      setLoader(false)
+
+    } catch (error) {
+      console.error("Cloudinary upload error:", error.message);
+      alert("Image upload failed! Please try again.");
+      return null;
     }
+  };
 
-    const onImageRemove = (image, index) => {
-        const result = selectedFileList.filter((item) => item!=image)
-
-        setSelectedFileList(result) ; 
-    }
-
-    // const UploadImages = () => {
-        
-    // }
+  // Remove an image from the selected list
+  const onImageRemove = (image) => {
+    setSelectedFileList((prev) => prev.filter((item) => item !== image));
+  };
 
   return (
     <div>
-        <h2 className='font-medium text-xl my-3'>Upload Car Images</h2>
-      <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5'>
+      <h2 className="font-medium text-xl my-3">Upload Images</h2>
+      
+      {/* Image Preview Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5">
+        {selectedFileList.map((image, index) => (
+          <div key={index} className="relative">
+            <IoMdCloseCircle
+              className="absolute m-2 text-lg text-white cursor-pointer"
+              onClick={() => onImageRemove(image)}
+            />
+            <img
+              src={URL.createObjectURL(image)}
+              className="w-full h-[130px] object-cover rounded-xl"
+              alt="preview"
+            />
+          </div>
+        ))}
 
-        {
-            selectedFileList.map((image, index) => (
-                <div key={index}>
-                    <IoMdCloseCircle className='absolute m-2 text-lg text-white'
-                    onClick={()=> onImageRemove(image, index)}
-                    />
-                    <img 
-                        src={URL.createObjectURL(image)}
-                        className='w-full h-[130px] object-cover rounded-xl'
-                    />
-                </div>
-            ))
-        }
-
-        <label htmlFor='upload-images'>
-            <div className='border rounded-xl border-dotted border-[#405ef2] bg-blue-100 p-10 cursor-pointer hover:shadow-md'>
-                <h2 className='text-lg text-center text-[#405ef2]'>+</h2>
-            </div>
+        {/* File Upload Button */}
+        <label htmlFor="upload-images">
+          <div className="border rounded-xl border-dotted border-[#405ef2] bg-blue-100 p-10 cursor-pointer hover:shadow-md">
+            <h2 className="text-lg text-center text-[#405ef2]">+</h2>
+          </div>
         </label>
-        <input 
-        type='file' 
-        multiple={true} 
-        id='upload-images'
-        className='opacity-0'
-        onChange={onFileSelected}
+
+        {/* Hidden File Input */}
+        <input
+          type="file"
+          multiple
+          id="upload-images"
+          className="opacity-0 absolute"
+          onChange={onFileSelected}
         />
       </div>
-      <Button onClick={uploadImageToCloudinary}>Upload Images</Button>
-    </div>
-  )
-}
 
-export default UploadImages
+    </div>
+  );
+};
+
+export default UploadImages;

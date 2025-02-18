@@ -15,7 +15,7 @@ const FormatResult = (resp) => {
             };
         }
 
-        console.log("Listing ID:", listingId, "Result Object:", result[listingId]);
+        // console.log("Listing ID:", listingId, "Result Object:", result[listingId]);
 
         // Check if carImages is an object and has an imageUrl
         if (item.carImages && item.carImages.imageUrl) {

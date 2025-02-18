@@ -1,12 +1,29 @@
+import { eq } from "drizzle-orm";
 import { db } from "./../../../configs";
 import { CarImages } from "./../../../configs/schema";
 import React, { useEffect, useState } from "react";
-import { IoMdCloseCircle } from "react-icons/io";
+import { IoMdClose, IoMdCloseCircle } from "react-icons/io";
 
-const UploadImages = ({triggerUploadImages, setLoader}) => {
+const UploadImages = ({triggerUploadImages, setLoader, carInfo, mode}) => {
 
   const [selectedFileList, setSelectedFileList] = useState([]);
   const [uploadedImages, setUploadedImages] = useState([]);
+  const [EditCarImageList, setEditCarImageList] = useState([])
+
+  useEffect(()=> {
+    if(mode == 'edit' )
+    {
+      setEditCarImageList([]) ; 
+
+      carInfo?.images.forEach((image) => {
+        setEditCarImageList(prev => [...prev, image?.imageUrl])
+
+        console.log('Edit image: ', image)
+      })
+    }
+  }, [carInfo])
+  
+  console.log('car info images: ', carInfo?.images)
 
   useEffect(()=> {
 
@@ -92,9 +109,19 @@ const UploadImages = ({triggerUploadImages, setLoader}) => {
   };
 
   // Remove an image from the selected list
+
   const onImageRemove = (image) => {
     setSelectedFileList((prev) => prev.filter((item) => item !== image));
   };
+
+  const onImageRemoveFromDB = async (image, index) => {
+    
+    const result = await db.delete(CarImages).where(eq(CarImages.id, carInfo?.images[index]?.id)).returning({id: CarImages.id})
+
+    const imageList = EditCarImageList.filter(item => item!= image)
+
+    setEditCarImageList(imageList) ; 
+  }
 
   return (
     <div>
@@ -102,7 +129,22 @@ const UploadImages = ({triggerUploadImages, setLoader}) => {
       
       {/* Image Preview Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5">
-        {selectedFileList.map((image, index) => (
+
+      {
+        mode == 'edit' && 
+        EditCarImageList?.map((image, index) => (
+          <div key={index}>
+            <IoMdCloseCircle
+              className="absolute m-2 text-lg text-white"
+              onClick={()=> onImageRemoveFromDB(image, index)}
+            />
+            <img src={image} className="w-full h-[130px] object-cover rounded-xl" />
+          </div>
+        ))
+      }
+
+        {
+          selectedFileList.map((image, index) => (
           <div key={index} className="relative">
             <IoMdCloseCircle
               className="absolute m-2 text-lg text-white cursor-pointer"
@@ -114,7 +156,8 @@ const UploadImages = ({triggerUploadImages, setLoader}) => {
               alt="preview"
             />
           </div>
-        ))}
+        ))
+        }
 
         {/* File Upload Button */}
         <label htmlFor="upload-images">

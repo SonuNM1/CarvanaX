@@ -53,7 +53,7 @@ const AddListing = () => {
       setCarInfo(resp[0])
       setFormData(resp[0])
       setFeaturesData(resp[0].features)
-      
+
   }
 
   /**
@@ -111,6 +111,8 @@ const AddListing = () => {
           ...formData,
           features: featuresData,
           createdBy: user?.primaryEmailAddress?.emailAddress,
+          userName: user?.fullName,
+          userImageUrl: user?.imageUrl,
           postedOn: moment().format('DD/MM/yyyy')
         }
       ).returning({id:CarListing.id}) ; 
@@ -198,6 +200,9 @@ const AddListing = () => {
             <UploadImages
               triggerUploadImages={triggerUploadImages}
 
+              carInfo={carInfo}
+              mode={mode}
+
               setLoader={(v) => {
                 setLoader(v) ; 
                 navigate('/profile')
@@ -225,4 +230,4 @@ const AddListing = () => {
 
 export default AddListing
 
-// 1.51 - 2.30 - 3.02 - 3.12 
+// 1.51 - 2.30 - 3.02 - 3.12 - 3.58

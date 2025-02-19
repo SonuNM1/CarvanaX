@@ -13,6 +13,8 @@ import Pricing from "../components/Pricing";
 import Specification from "../components/Specification";
 import OwnersDetail from "../components/OwnersDetail";
 import FinancialCalculator from "../components/FinancialCalculator";
+import Footer from "@/components/Footer";
+import MostSearchedCar from "@/components/MostSearchedCar";
 
 const ListingDetail = () => {
   const { id } = useParams();
@@ -86,7 +88,10 @@ const ListingDetail = () => {
           <OwnersDetail carDetail={carDetail}/>
 
         </div>
+        
       </div>
+      <MostSearchedCar/>
+      <Footer/>
     </div>
   );
 };

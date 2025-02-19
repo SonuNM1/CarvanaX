@@ -12,6 +12,7 @@ import { Toaster } from 'sonner'
 import SearchByCategory from './search/[category]'
 import SearchByOptions from './search'
 import ListingDetail from './listing-details/[id]'
+import SignInPage from './Shared/SignInPage'
 
 // Import your Publishable Key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <Home/>
+  },
+  {
+    path: 'sign-in',
+    element: <SignInPage/>
   },
   {
     path: '/contact',

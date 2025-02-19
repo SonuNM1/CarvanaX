@@ -1,4 +1,4 @@
-import { UserButton, useUser } from '@clerk/clerk-react'
+import { SignInButton, UserButton, useUser } from '@clerk/clerk-react'
 import React from 'react'
 import { Button } from './ui/button';
 import { Link } from 'react-router-dom';
@@ -30,7 +30,25 @@ const Header = () => {
                 </Link>
             </div>
             : 
-            <Button className='cursor-pointer'>Submit Listing</Button>
+            <div className='flex items-center gap-4'>
+
+              {/* Sign-in Button */}
+
+              <SignInButton mode='modal'>
+                <Button className='cursor-pointer bg-blue-500 hover:bg-blue-700 text-white'>
+                    Login
+                </Button>
+              </SignInButton>
+
+              {/* Disabled submit listing button */}
+
+              <Button className='cursor-not-allowed bg-gray-400 text-white'
+              disabled
+              > 
+                Submit Listing
+              </Button>
+
+            </div>
       }
 
     </div>

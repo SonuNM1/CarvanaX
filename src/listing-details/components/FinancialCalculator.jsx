@@ -9,6 +9,7 @@ const FinancialCalculator = ({carDetail}) => {
     const [interestRate, setInterestRate] = useState()
     const [loanTerm, setLoanTerm] = useState()
     const [downPayment, setDownPayment] = useState()
+    const [monthlyPayment, setMonthlyPayment] = useState(0)
 
     const CalculateMonthlyPayment = () => {
         const Principal = carPrice - downPayment ; 
@@ -16,7 +17,7 @@ const FinancialCalculator = ({carDetail}) => {
 
         const MonthlyPayment = (Principal * MonthlyInterestRate * Math.pow(1+ MonthlyInterestRate, loanTerm)) / (Math.pow(1+MonthlyInterestRate, loanTerm) - 1) ; 
 
-        console.log('monthly payment: ', MonthlyPayment)
+        setMonthlyPayment(MonthlyPayment.toFixed(2))
     }
 
   return (
@@ -57,6 +58,9 @@ const FinancialCalculator = ({carDetail}) => {
         </div>
       </div>
 
+      {
+        monthlyPayment > 0 && <h2 className='font-medium text-2xl mt-5'>Your monthly payment is: <span className='text-4xl font-bold'>${monthlyPayment}</span> </h2>
+      }
       <Button 
         className="w-full mt-5 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white" 
         size="lg"

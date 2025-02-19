@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import MyListing from "./components/MyListing";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Inbox from "./components/Inbox";
 
 const Profile = () => {
   return (
@@ -19,7 +20,7 @@ const Profile = () => {
             <MyListing/>
           </TabsContent>
           <TabsContent value="inbox">
-            Inbox Tab
+            <Inbox/>
           </TabsContent>
           <TabsContent value="profile">
             Profile Tab

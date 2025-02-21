@@ -218,7 +218,7 @@ const AddListing = () => {
               {
                 !loader ? "Submit" : <BiLoaderAlt className='animate-spin text-lg'/> 
               }
-              Submit</Button>
+              </Button>
             </div>
 
         </form>

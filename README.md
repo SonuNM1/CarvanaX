@@ -1,3 +1,39 @@
+# 🚗 CarvanaX (Car Marketplace)  
+
+A modern and responsive car listing platform where users can add, browse, and manage car listings with ease.  
+
+## ✨ Features  
+
+- ✅ **User Authentication** (including social auth like **Continue with Google**)  
+- 🔍 **Search Functionality** for finding specific cars easily  
+- ✉️ **Send Messages** directly to the car owner  
+- ➕ **Add New Car Listings** with detailed specifications  
+- 🏦 **Financial Calculator** to estimate monthly payments  
+- 🛠️ **Edit & Delete** existing car listings  
+- 🔄 **Filter by Category** (SUV, Sedan, Hybrid, Convertible, etc.)  
+- 📋 **Detailed Car Specifications and Features**  
+- 🚀 **Smooth Navigation and User-Friendly Interface**  
+
+## 📸 Project Preview  
+
+<table>
+  <tr>
+    <td><img src="./public/1.png" alt="Collage 1" width="400"/></td>
+    <td><img src="./public/2.png" alt="Collage 2" width="400"/></td>
+  </tr>
+</table>
+
+---
+
+## 🚀 Getting Started  
+
+### Clone the Repository  
+```sh
+git clone https://github.com/your-username/car-listing-platform.git
+cd car-listing-platform
+
+
+
 
 - npx shadcn@canary add select
 

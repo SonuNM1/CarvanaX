@@ -100,7 +100,7 @@ const CarItem = ({ car }) => {
           <h2 className="font-bold text-xl">{car?.sellingPrice || "N/A"}</h2>
           <Link
             to={"/listing-details/" + car?.id}
-            className="text-[#405ef2] hover:text-blue-800 text-sm flex gap-2 items-center"
+            className="text-[#405ef2] hover:text-purple-800 text-sm flex gap-2 items-center"
           >
             View Details <MdOpenInNew />
           </Link>

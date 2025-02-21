@@ -71,7 +71,7 @@ const Search = () => {
       </Select>
 
       <Link to={'/search?cars='+cars+"&maker="+maker+"&price="+price} >
-        <CiSearch className="text-[50px] bg-[#405ef2] rounded-full p-3 text-white hover:scale-105 transition-all cursor-pointer animate-bounce"/>
+        <CiSearch className="text-[50px] bg-[#405ef2] rounded-full p-3 text-white hover:scale-105 transition-all cursor-pointer"/>
       </Link>
     </div>
   );

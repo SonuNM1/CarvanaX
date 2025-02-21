@@ -15,10 +15,8 @@ const Header = () => {
       </Link>
 
       <ul className='hidden md:flex gap-16'>
-        <li className='font-medium hover:scale-105 transition-all cursor-pointer'>Home</li>
-        <li className='font-medium hover:scale-105 transition-all cursor-pointer'>Search</li>
-        <li className='font-medium hover:scale-105 transition-all cursor-pointer'>New</li>
-        <li className='font-medium hover:scale-105 transition-all cursor-pointer'>Preowned</li>
+        <a href = '/' className='font-medium hover:scale-105 transition-all cursor-pointer'>Home</a>
+        <a href = '/contact' className='font-medium hover:scale-105 transition-all cursor-pointer'>Contact</a>
       </ul>
 
       {
